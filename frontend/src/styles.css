@@ -11,36 +11,16 @@ body {
   justify-content: center;
   font-family: 'Inter', 'SF Pro Display', -apple-system, system-ui, sans-serif;
   overflow-x: hidden;
-  background: #c8c8cc;
+  background: #1a1a2e;
   background-image:
-    radial-gradient(ellipse at 20% 50%, rgba(160, 160, 175, 0.5) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 20%, rgba(140, 140, 160, 0.4) 0%, transparent 40%),
-    radial-gradient(ellipse at 50% 100%, rgba(150, 150, 170, 0.4) 0%, transparent 45%);
+    radial-gradient(circle at 15% 25%, rgba(102, 126, 234, 0.6) 0%, transparent 35%),
+    radial-gradient(circle at 85% 15%, rgba(118, 75, 162, 0.5) 0%, transparent 30%),
+    radial-gradient(circle at 50% 80%, rgba(240, 147, 43, 0.35) 0%, transparent 35%),
+    radial-gradient(circle at 75% 65%, rgba(236, 110, 151, 0.3) 0%, transparent 25%),
+    radial-gradient(circle at 25% 75%, rgba(67, 206, 162, 0.3) 0%, transparent 30%);
 }
 
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background:
-    repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 60px,
-      rgba(0, 0, 0, 0.06) 60px,
-      rgba(0, 0, 0, 0.06) 61px
-    ),
-    repeating-linear-gradient(
-      90deg,
-      transparent,
-      transparent 60px,
-      rgba(0, 0, 0, 0.06) 60px,
-      rgba(0, 0, 0, 0.06) 61px
-    );
-  pointer-events: none;
-}
-
-/* ── Container ── */
+/* ── Container (glass panel) ── */
 .container {
   position: relative;
   z-index: 1;
@@ -48,33 +28,44 @@ body::before {
   width: 100%;
   margin: 40px auto;
   text-align: center;
-  color: #333;
+  color: #fff;
   padding: 52px 48px;
   border-radius: 28px;
 
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(40px) saturate(1.4);
-  -webkit-backdrop-filter: blur(40px) saturate(1.4);
-  border: 1px solid rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(24px) saturate(1.6);
+  -webkit-backdrop-filter: blur(24px) saturate(1.6);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.85) inset,
-    0 -1px 0 rgba(0, 0, 0, 0.04) inset,
-    0 2px 6px rgba(0, 0, 0, 0.05),
-    0 10px 30px rgba(0, 0, 0, 0.08),
-    0 30px 70px rgba(0, 0, 0, 0.1);
+    0 8px 32px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.05);
 
   animation: containerFloat 0.7s cubic-bezier(0.22, 1, 0.36, 1);
   transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.5s ease;
 }
 
+.container::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 28px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.02) 40%,
+    transparent 60%,
+    rgba(255, 255, 255, 0.04) 100%
+  );
+  pointer-events: none;
+}
+
 .container:hover {
   transform: translateY(-4px);
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.8) inset,
-    0 -1px 0 rgba(0, 0, 0, 0.04) inset,
-    0 4px 10px rgba(0, 0, 0, 0.05),
-    0 14px 36px rgba(0, 0, 0, 0.08),
-    0 36px 80px rgba(0, 0, 0, 0.1);
+    0 12px 48px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.05);
 }
 
 @keyframes containerFloat {
@@ -84,18 +75,19 @@ body::before {
 
 /* ── Title ── */
 h1 {
-  font-size: 2rem;
+  font-size: 2.2rem;
   font-weight: 700;
   letter-spacing: -0.5px;
-  color: #1a1a1a;
+  color: #fff;
   margin-bottom: 6px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 /* ── Status ── */
 .status {
   font-size: 15px;
   font-weight: 500;
-  color: #888;
+  color: rgba(255, 255, 255, 0.55);
   margin: 18px 0;
   min-height: 24px;
   animation: statusFade 0.35s ease;
@@ -106,25 +98,26 @@ h1 {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Board ── */
+/* ── Board (inner glass panel) ── */
 .board {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 12px;
   margin: 28px auto;
   padding: 16px;
-  border-radius: 24px;
+  border-radius: 22px;
   max-width: 480px;
 
-  background: rgba(238, 238, 242, 0.65);
-  border: 1px solid rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.9) inset,
-    0 6px 20px rgba(0, 0, 0, 0.06),
-    0 1px 3px rgba(0, 0, 0, 0.05);
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
-/* ── Cells ── */
+/* ── Cells (glass tiles) ── */
 .cell {
   aspect-ratio: 1;
   display: flex;
@@ -132,18 +125,19 @@ h1 {
   justify-content: center;
   font-size: 48px;
   font-weight: 700;
-  color: #222;
-  border-radius: 18px;
+  color: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
   cursor: pointer;
   position: relative;
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, background 0.2s;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, background 0.25s;
 
-  background: rgba(255, 255, 255, 0.75);
-  border: 1px solid rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.9) inset,
-    0 2px 6px rgba(0, 0, 0, 0.06),
-    0 6px 16px rgba(0, 0, 0, 0.04);
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 2px 8px rgba(0, 0, 0, 0.12);
 }
 
 .cell::before {
@@ -151,17 +145,24 @@ h1 {
   position: absolute;
   inset: 0;
   border-radius: 16px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, transparent 50%);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.15) 0%,
+    rgba(255, 255, 255, 0.03) 50%,
+    transparent 100%
+  );
   pointer-events: none;
+  transition: opacity 0.25s;
 }
 
 .cell:hover:not(.taken) {
   transform: translateY(-6px) scale(1.04);
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.25);
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.9) inset,
-    0 6px 20px rgba(0, 0, 0, 0.08),
-    0 2px 6px rgba(0, 0, 0, 0.05);
-  background: rgba(255, 255, 255, 0.9);
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 8px 28px rgba(0, 0, 0, 0.2),
+    0 0 20px rgba(255, 255, 255, 0.05);
 }
 
 .cell:active:not(.taken) {
@@ -171,6 +172,7 @@ h1 {
 
 .cell.taken {
   cursor: not-allowed;
+  color: #fff;
 }
 
 /* ── Pop-in animation ── */
@@ -187,18 +189,18 @@ h1 {
 /* ── Win cells ── */
 .cell.win {
   color: #fff;
-  background: linear-gradient(135deg, #444, #222);
-  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.35);
   animation: winGlow 0.8s ease infinite alternate;
   box-shadow:
-    0 0 0 2px rgba(255, 255, 255, 0.2),
-    0 0 30px rgba(0, 0, 0, 0.15),
-    0 8px 30px rgba(0, 0, 0, 0.12);
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    0 0 24px rgba(255, 255, 255, 0.12),
+    0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
 @keyframes winGlow {
-  0% { transform: translateY(0) scale(1); box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2), 0 0 20px rgba(0, 0, 0, 0.1), 0 8px 24px rgba(0, 0, 0, 0.1); }
-  100% { transform: translateY(-4px) scale(1.05); box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.35), 0 0 40px rgba(0, 0, 0, 0.12), 0 14px 40px rgba(0, 0, 0, 0.14); }
+  0% { transform: translateY(0) scale(1); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 0 20px rgba(255, 255, 255, 0.08), 0 8px 24px rgba(0, 0, 0, 0.15); }
+  100% { transform: translateY(-4px) scale(1.05); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 0 40px rgba(255, 255, 255, 0.15), 0 14px 40px rgba(0, 0, 0, 0.2); }
 }
 
 /* ── Players ── */
@@ -215,24 +217,21 @@ h1 {
   padding: 8px 20px;
   border-radius: 12px;
   transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-  background: rgba(245, 245, 248, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.7);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
-  color: #999;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.4);
 }
 
 .active-player {
   font-weight: 700;
-  color: #1a1a1a;
-  background: rgba(255, 255, 255, 0.85) !important;
-  border-color: rgba(200, 200, 210, 0.5) !important;
-  box-shadow:
-    0 2px 8px rgba(0, 0, 0, 0.06),
-    0 0 0 1px rgba(0, 0, 0, 0.03) !important;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 0 16px rgba(255, 255, 255, 0.06) !important;
   transform: translateY(-2px);
 }
 
-/* ── Buttons ── */
+/* ── Buttons (glass) ── */
 button {
   padding: 13px 32px;
   font-size: 15px;
@@ -243,13 +242,15 @@ button {
   cursor: pointer;
   color: #fff;
   position: relative;
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, background 0.2s;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, background 0.25s;
 
-  background: linear-gradient(135deg, #333, #1a1a1a);
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   box-shadow:
-    0 2px 0 #0a0a0a,
-    0 4px 12px rgba(0, 0, 0, 0.15),
-    0 1px 0 rgba(255, 255, 255, 0.08) inset;
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
 button::before {
@@ -257,61 +258,63 @@ button::before {
   position: absolute;
   inset: 0;
   border-radius: 14px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, transparent 50%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, transparent 50%);
   pointer-events: none;
 }
 
 button:hover {
   transform: translateY(-3px);
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.28);
   box-shadow:
-    0 4px 0 #0a0a0a,
-    0 8px 24px rgba(0, 0, 0, 0.2),
-    0 1px 0 rgba(255, 255, 255, 0.1) inset;
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 8px 28px rgba(0, 0, 0, 0.2);
 }
 
 button:active {
   transform: translateY(1px);
+  background: rgba(255, 255, 255, 0.08);
   box-shadow:
-    0 0 0 #0a0a0a,
-    0 2px 6px rgba(0, 0, 0, 0.15),
-    0 1px 0 rgba(255, 255, 255, 0.06) inset;
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 2px 8px rgba(0, 0, 0, 0.15);
   transition-duration: 0.1s;
 }
 
-/* ── Inputs ── */
+/* ── Inputs (glass) ── */
 input {
   padding: 12px 18px;
   font-size: 15px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.6);
-  color: #222;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #fff;
   margin-right: 8px;
   outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
-  border: 1.5px solid rgba(200, 200, 210, 0.4);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04) inset;
+  transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 input::placeholder {
-  color: #aaa;
+  color: rgba(255, 255, 255, 0.35);
 }
 
 input:focus {
-  border-color: #999;
-  background: rgba(255, 255, 255, 0.85);
-  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.04), 0 1px 4px rgba(0, 0, 0, 0.04) inset;
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 /* ── Game ID ── */
 .game-id {
   font-family: 'SF Mono', 'Fira Code', monospace;
   font-size: 13px;
-  background: rgba(245, 245, 248, 0.6);
+  background: rgba(255, 255, 255, 0.08);
   padding: 5px 12px;
   border-radius: 8px;
   user-select: all;
-  border: 1px solid rgba(200, 200, 210, 0.3);
-  color: #555;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
 }
 
 /* ── Dividers ── */
@@ -319,7 +322,7 @@ input:focus {
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 3px;
-  color: #bbb;
+  color: rgba(255, 255, 255, 0.3);
   margin: 28px 0 16px;
   position: relative;
 }
@@ -331,7 +334,7 @@ input:focus {
   top: 50%;
   width: 50px;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.08), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
 }
 
 .divider::before { right: calc(50% + 48px); }
@@ -354,11 +357,14 @@ input:focus {
   font-size: 13px;
   font-weight: 600;
   border-radius: 10px;
-  background: rgba(245, 245, 248, 0.5);
-  color: #aaa;
-  border: 1px solid rgba(200, 200, 210, 0.3);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: all 0.25s ease;
+  position: relative;
 }
 
 .diff-btn::before {
@@ -366,28 +372,28 @@ input:focus {
   position: absolute;
   inset: 0;
   border-radius: 10px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, transparent 50%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
   pointer-events: none;
 }
 
 .diff-btn:hover {
-  color: #555;
-  background: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.1);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  border-color: rgba(255, 255, 255, 0.15);
 }
 
 .diff-btn.active {
-  color: #1a1a1a;
-  background: rgba(255, 255, 255, 0.9);
-  border-color: rgba(0, 0, 0, 0.1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  color: #fff;
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 0 16px rgba(255, 255, 255, 0.06), 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .ai-badge {
   font-size: 13px;
   font-weight: 500;
-  color: #999;
+  color: rgba(255, 255, 255, 0.45);
   margin: 6px 0;
 }
 
