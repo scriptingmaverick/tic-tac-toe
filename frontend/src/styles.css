@@ -119,3 +119,67 @@ input:focus {
   font-weight: bold;
   color: #53fb8b;
 }
+
+.divider {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #666;
+  margin: 20px 0 12px;
+  position: relative;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 60px;
+  height: 1px;
+  background: #333;
+}
+
+.divider::before {
+  right: calc(50% + 40px);
+}
+
+.divider::after {
+  left: calc(50% + 40px);
+}
+
+.ai-section {
+  margin-bottom: 8px;
+}
+
+.difficulty-row {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.diff-btn {
+  padding: 6px 16px;
+  font-size: 13px;
+  background: #1a1a2e;
+  color: #888;
+  border: 1px solid #333;
+  border-radius: 6px;
+}
+
+.diff-btn:hover {
+  background: #16213e;
+  color: #e0e0e0;
+}
+
+.diff-btn.active {
+  background: #0f3460;
+  color: #53fb8b;
+  border-color: #53fb8b;
+}
+
+.ai-badge {
+  font-size: 13px;
+  color: #53fb8b;
+  margin: 4px 0;
+}

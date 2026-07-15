@@ -1,6 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { Game, createGame, joinGame, makeMove, resetGame, getGame } from "./api";
+import { getAIMove } from "./ai";
 import "./styles.css";
+
+type Difficulty = "easy" | "medium" | "hard";
 
 function App() {
   const [game, setGame] = useState<Game | null>(null);
@@ -8,6 +11,9 @@ function App() {
   const [playerSymbol, setPlayerSymbol] = useState<"X" | "O" | null>(null);
   const [joinId, setJoinId] = useState("");
   const [error, setError] = useState("");
+
+  const [aiMode, setAiMode] = useState(false);
+  const [difficulty, setDifficulty] = useState<Difficulty>("medium");
 
   const fetchGame = useCallback(async (id: string) => {
     try {
@@ -19,10 +25,26 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (!game) return;
+    if (!game || aiMode) return;
     const interval = setInterval(() => fetchGame(game.id), 1500);
     return () => clearInterval(interval);
-  }, [game?.id, fetchGame]);
+  }, [game?.id, fetchGame, aiMode]);
+
+  const startAIGame = () => {
+    if (!playerName.trim()) return setError("Enter your name");
+    setError("");
+    const localGame: Game = {
+      id: "local",
+      board: [null, null, null, null, null, null, null, null, null],
+      currentPlayer: "X",
+      status: "playing",
+      winner: null,
+      players: { X: playerName.trim(), O: "Computer" },
+    };
+    setGame(localGame);
+    setPlayerSymbol("X");
+    setAiMode(true);
+  };
 
   const handleCreate = async () => {
     if (!playerName.trim()) return setError("Enter your name");
@@ -31,6 +53,7 @@ function App() {
     const joined = await joinGame(newGame.id, playerName.trim());
     setGame(joined);
     setPlayerSymbol("X");
+    setAiMode(false);
   };
 
   const handleJoin = async () => {
@@ -45,9 +68,24 @@ function App() {
       }
       setGame(joined);
       setPlayerSymbol("O");
+      setAiMode(false);
     } catch {
       setError("Game not found");
     }
+  };
+
+  const checkWinnerLocal = (board: (string | null)[]): "X" | "O" | null => {
+    const combos = [
+      [0, 1, 2], [3, 4, 5], [6, 7, 8],
+      [0, 3, 6], [1, 4, 7], [2, 5, 8],
+      [0, 4, 8], [2, 4, 6],
+    ];
+    for (const [a, b, c] of combos) {
+      if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+        return board[a] as "X" | "O";
+      }
+    }
+    return null;
   };
 
   const handleCellClick = async (index: number) => {
@@ -56,6 +94,47 @@ function App() {
     if (game.currentPlayer !== playerSymbol) return;
     if (game.board[index] !== null) return;
 
+    if (aiMode) {
+      // Player move
+      const newBoard = [...game.board];
+      newBoard[index] = playerSymbol;
+      const winner = checkWinnerLocal(newBoard);
+      const isDraw = newBoard.every((c) => c !== null);
+
+      const updatedGame: Game = {
+        ...game,
+        board: newBoard,
+        winner,
+        status: winner ? "won" : isDraw ? "draw" : "playing",
+        currentPlayer: winner || isDraw ? game.currentPlayer : game.currentPlayer === "X" ? "O" : "X",
+      };
+      setGame(updatedGame);
+
+      // AI move after a short delay
+      if (!winner && !isDraw) {
+        setTimeout(() => {
+          const aiMoveIdx = getAIMove(updatedGame.board as ("X" | "O" | null)[], difficulty);
+          if (aiMoveIdx === -1) return;
+          const aiBoard = [...updatedGame.board];
+          aiBoard[aiMoveIdx] = "O";
+          const aiWinner = checkWinnerLocal(aiBoard);
+          const aiDraw = aiBoard.every((c) => c !== null);
+          setGame((prev) => {
+            if (!prev || prev.id !== "local") return prev;
+            return {
+              ...prev,
+              board: aiBoard,
+              winner: aiWinner,
+              status: aiWinner ? "won" : aiDraw ? "draw" : "playing",
+              currentPlayer: aiWinner || aiDraw ? prev.currentPlayer : "X",
+            };
+          });
+        }, 400);
+      }
+      return;
+    }
+
+    // Online move
     try {
       const updated = await makeMove(game.id, index, playerSymbol);
       setGame(updated);
@@ -66,6 +145,16 @@ function App() {
 
   const handleReset = async () => {
     if (!game) return;
+    if (aiMode) {
+      setGame({
+        ...game,
+        board: [null, null, null, null, null, null, null, null, null],
+        currentPlayer: "X",
+        status: "playing",
+        winner: null,
+      });
+      return;
+    }
     const updated = await resetGame(game.id);
     setGame(updated);
   };
@@ -97,6 +186,24 @@ function App() {
             onChange={(e) => setPlayerName(e.target.value)}
           />
         </div>
+
+        <div className="divider">Single Player</div>
+        <div className="ai-section">
+          <div className="difficulty-row">
+            {(["easy", "medium", "hard"] as Difficulty[]).map((d) => (
+              <button
+                key={d}
+                className={`diff-btn${difficulty === d ? " active" : ""}`}
+                onClick={() => setDifficulty(d)}
+              >
+                {d.charAt(0).toUpperCase() + d.slice(1)}
+              </button>
+            ))}
+          </div>
+          <button onClick={startAIGame}>Play vs Computer</button>
+        </div>
+
+        <div className="divider">Multiplayer</div>
         <div style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 16 }}>
           <button onClick={handleCreate}>Create Game</button>
         </div>
@@ -115,12 +222,30 @@ function App() {
 
   const winCells = getWinCells();
 
+  const statusText = (() => {
+    if (game.status === "waiting") return "Waiting for opponent...";
+    if (game.status === "won") {
+      if (aiMode) return game.winner === playerSymbol ? "You won!" : "Computer wins!";
+      return game.winner === playerSymbol ? "You won!" : "You lost!";
+    }
+    if (game.status === "draw") return "It's a draw!";
+    if (game.currentPlayer === playerSymbol) return "Your turn!";
+    return aiMode ? "Computer is thinking..." : "Opponent's turn...";
+  })();
+
   return (
     <div className="container">
       <h1>Tic Tac Toe</h1>
-      <p>
-        Game ID: <span className="game-id">{game.id}</span>
-      </p>
+      {!aiMode && (
+        <p>
+          Game ID: <span className="game-id">{game.id}</span>
+        </p>
+      )}
+      {aiMode && (
+        <p className="ai-badge">
+          vs Computer ({difficulty.charAt(0).toUpperCase() + difficulty.slice(1)})
+        </p>
+      )}
       <div className="players">
         <span className={game.currentPlayer === "X" ? "active-player" : ""}>
           X: {game.players.X || "Waiting..."}
@@ -129,16 +254,7 @@ function App() {
           O: {game.players.O || "Waiting..."}
         </span>
       </div>
-      <p className="status">
-        {game.status === "waiting" && "Waiting for opponent..."}
-        {game.status === "playing" &&
-          (game.currentPlayer === playerSymbol
-            ? "Your turn!"
-            : "Opponent's turn...")}
-        {game.status === "won" &&
-          (game.winner === playerSymbol ? "You won!" : "You lost!")}
-        {game.status === "draw" && "It's a draw!"}
-      </p>
+      <p className="status">{statusText}</p>
       <div className="board">
         {game.board.map((cell, i) => (
           <div
