@@ -6,7 +6,7 @@ import "./styles.css";
 type Difficulty = "easy" | "medium" | "hard";
 
 function Confetti() {
-  const colors = ["#e94560", "#53fb8b", "#f5c842", "#42a5f5", "#ab47bc", "#ff7043"];
+  const colors = ["#222", "#555", "#888", "#bbb", "#ddd", "#fff"];
   const pieces = Array.from({ length: 50 }, (_, i) => ({
     id: i,
     left: Math.random() * 100,
