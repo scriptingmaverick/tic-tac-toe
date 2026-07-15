@@ -4,6 +4,12 @@
   grid-template-rows: repeat(3, 100px);
   gap: 4px;
   margin: 20px auto;
+  animation: boardFadeIn 0.4s ease;
+}
+
+@keyframes boardFadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 .cell {
@@ -19,20 +25,39 @@
   border: 2px solid #0f3460;
   border-radius: 8px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.2s, transform 0.15s, border-color 0.3s, box-shadow 0.3s;
+  position: relative;
 }
 
 .cell:hover:not(.taken) {
   background: #16213e;
+  transform: scale(1.05);
 }
 
 .cell.taken {
   cursor: not-allowed;
 }
 
+.cell.pop {
+  animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.3); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
 .cell.win {
   background: #0f3460;
   color: #53fb8b;
+  border-color: #53fb8b;
+  animation: winPulse 0.6s ease infinite alternate;
+  box-shadow: 0 0 16px rgba(83, 251, 139, 0.4);
+}
+
+@keyframes winPulse {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.08); box-shadow: 0 0 24px rgba(83, 251, 139, 0.6); }
 }
 
 .container {
@@ -45,17 +70,35 @@
   padding: 30px;
   border-radius: 16px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  animation: containerSlideIn 0.5s ease;
+}
+
+@keyframes containerSlideIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 h1 {
   color: #e94560;
   margin-bottom: 8px;
+  animation: titleGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes titleGlow {
+  from { text-shadow: 0 0 8px rgba(233, 69, 96, 0.3); }
+  to { text-shadow: 0 0 20px rgba(233, 69, 96, 0.6); }
 }
 
 .status {
   font-size: 18px;
   margin: 16px 0;
   min-height: 28px;
+  animation: statusFade 0.3s ease;
+}
+
+@keyframes statusFade {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 button {
@@ -67,11 +110,16 @@ button {
   background: #e94560;
   color: white;
   font-weight: 600;
-  transition: background 0.2s;
+  transition: background 0.2s, transform 0.15s;
 }
 
 button:hover {
   background: #c73e54;
+  transform: scale(1.05);
+}
+
+button:active {
+  transform: scale(0.97);
 }
 
 input {
@@ -83,10 +131,12 @@ input {
   color: #e0e0e0;
   margin-right: 8px;
   outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 input:focus {
   border-color: #e94560;
+  box-shadow: 0 0 8px rgba(233, 69, 96, 0.3);
 }
 
 .join-section {
@@ -113,11 +163,19 @@ input:focus {
   padding: 4px 12px;
   border-radius: 6px;
   background: #1a1a2e;
+  transition: color 0.3s, background 0.3s;
 }
 
 .active-player {
   font-weight: bold;
   color: #53fb8b;
+  background: #0f3460 !important;
+  animation: activePulse 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes activePulse {
+  from { box-shadow: 0 0 4px rgba(83, 251, 139, 0.2); }
+  to { box-shadow: 0 0 12px rgba(83, 251, 139, 0.4); }
 }
 
 .divider {
@@ -176,10 +234,43 @@ input:focus {
   background: #0f3460;
   color: #53fb8b;
   border-color: #53fb8b;
+  animation: diffPulse 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes diffPulse {
+  from { box-shadow: 0 0 4px rgba(83, 251, 139, 0.2); }
+  to { box-shadow: 0 0 10px rgba(83, 251, 139, 0.35); }
 }
 
 .ai-badge {
   font-size: 13px;
   color: #53fb8b;
   margin: 4px 0;
+}
+
+/* Confetti */
+.confetti-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 100;
+}
+
+.confetti-piece {
+  position: absolute;
+  top: -20px;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  animation: confettiFall linear forwards;
+}
+
+@keyframes confettiFall {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
 }

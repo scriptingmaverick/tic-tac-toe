@@ -1,9 +1,40 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Game, createGame, joinGame, makeMove, resetGame, getGame } from "./api";
 import { getAIMove } from "./ai";
 import "./styles.css";
 
 type Difficulty = "easy" | "medium" | "hard";
+
+function Confetti() {
+  const colors = ["#e94560", "#53fb8b", "#f5c842", "#42a5f5", "#ab47bc", "#ff7043"];
+  const pieces = Array.from({ length: 50 }, (_, i) => ({
+    id: i,
+    left: Math.random() * 100,
+    color: colors[i % colors.length],
+    delay: Math.random() * 0.8,
+    duration: 1.5 + Math.random() * 1.5,
+    size: 6 + Math.random() * 8,
+  }));
+
+  return (
+    <div className="confetti-container">
+      {pieces.map((p) => (
+        <div
+          key={p.id}
+          className="confetti-piece"
+          style={{
+            left: `${p.left}%`,
+            backgroundColor: p.color,
+            width: p.size,
+            height: p.size,
+            animationDelay: `${p.delay}s`,
+            animationDuration: `${p.duration}s`,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
 
 function App() {
   const [game, setGame] = useState<Game | null>(null);
@@ -14,6 +45,37 @@ function App() {
 
   const [aiMode, setAiMode] = useState(false);
   const [difficulty, setDifficulty] = useState<Difficulty>("medium");
+
+  const [popCells, setPopCells] = useState<Set<number>>(new Set());
+  const [showConfetti, setShowConfetti] = useState(false);
+  const prevBoardRef = useRef<(string | null)[]>([]);
+
+  useEffect(() => {
+    if (!game) return;
+    const prev = prevBoardRef.current;
+    const newPops = new Set<number>();
+    game.board.forEach((cell, i) => {
+      if (cell && cell !== prev[i]) newPops.add(i);
+    });
+    if (newPops.size > 0) {
+      setPopCells((prev) => new Set([...prev, ...newPops]));
+      setTimeout(() => {
+        setPopCells((curr) => {
+          const next = new Set(curr);
+          newPops.forEach((i) => next.delete(i));
+          return next;
+        });
+      }, 350);
+    }
+    prevBoardRef.current = [...game.board];
+  }, [game?.board]);
+
+  useEffect(() => {
+    if (game?.status === "won" && game.winner === playerSymbol) {
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 3000);
+    }
+  }, [game?.status, game?.winner, playerSymbol]);
 
   const fetchGame = useCallback(async (id: string) => {
     try {
@@ -235,6 +297,7 @@ function App() {
 
   return (
     <div className="container">
+      {showConfetti && <Confetti />}
       <h1>Tic Tac Toe</h1>
       {!aiMode && (
         <p>
@@ -259,7 +322,7 @@ function App() {
         {game.board.map((cell, i) => (
           <div
             key={i}
-            className={`cell${cell ? " taken" : ""}${winCells.includes(i) ? " win" : ""}`}
+            className={`cell${cell ? " taken" : ""}${winCells.includes(i) ? " win" : ""}${popCells.has(i) ? " pop" : ""}`}
             onClick={() => handleCellClick(i)}
           >
             {cell}
